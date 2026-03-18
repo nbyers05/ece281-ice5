@@ -95,21 +95,69 @@ begin
 	-- CONCURRENT STATEMENTS ------------------------------------------------------------------------------
 	
 	-- Next State Logic
-  
+    next_state_proc : process(i_up_down,f_Q)
+begin
+        if i_up_down = '1' then
+            if f_Q = s_floor1 then
+                f_Q_next <= s_floor2;
+            elsif f_Q = s_floor2 then
+                f_Q_next <= s_floor3;
+            elsif f_Q = s_floor3 then
+                f_Q_next <= s_floor4;
+            elsif f_Q = s_floor4 then
+                f_Q_next <= s_floor4;
+            end if;
+        end if;
+        
+        if i_up_down = '0' then
+            if f_Q = s_floor1 then
+                f_Q_next <= s_floor1;
+            elsif f_Q = s_floor2 then
+                f_Q_next <= s_floor1;
+            elsif f_Q = s_floor3 then
+                f_Q_next <= s_floor2;
+            elsif f_Q = s_floor4 then
+                f_Q_next <= s_floor3;
+            end if;
+        end if;
+        
+end process next_state_proc;
 	-- Output logic
+	
+    output_proc : process(f_Q)
+begin
+    
+    if f_Q = s_floor1 then  
+        o_floor <= "0001";
+    elsif f_Q = s_floor2 then  
+        o_floor <= "0010";
+    elsif f_Q = s_floor3 then  
+        o_floor <= "0011";
+    elsif f_Q = s_floor4 then  
+        o_floor <= "0100";
+    end if;
+
+    
+end process output_proc;
 
 	-------------------------------------------------------------------------------------------------------
 	
 	-- PROCESSES ------------------------------------------------------------------------------------------	
 	
 	-- State register ------------
-	
+	register_proc : process (i_clk, i_reset,i_stop)
+begin
+    if i_reset = '1' then
+        f_Q <= s_floor2; 
+    elsif (i_stop) = '1' then  
+        f_Q <= f_Q;
+    elsif (rising_edge(i_clk)) then
+        f_Q <= f_Q_next;    -- next state becomes current state
+    end if;
+end process register_proc;
 	
 	-------------------------------------------------------------------------------------------------------
 	
 	
-
-
-
 end Behavioral;
 
